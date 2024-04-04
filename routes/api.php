@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\LoginController;
+use App\Http\Controllers\API\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,12 +26,21 @@ Route::prefix('auth/')->group(function(){
     Route::post('register', [AuthController::class,'register']);
     Route::post('login', [LoginController::class,'login']);
     Route::get('send-mail', [LoginController::class, 'testMail']);
+    Route::post('forgot-password', [LoginController::class, 'forgetPasswordReset']);
+    Route::post('reset-password', [LoginController::class, 'verifyAndChangePassword']);
 });
 
 
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('logout',[LoginController::class, 'logout']);
     Route::get('get-profile', [LoginController::class, 'getProfile']);
+    Route::post('change-password', [LoginController::class, 'changePassword']);
+    Route::post('update-profile', [LoginController::class, 'updateProfile']);
+});
+
+Route::middleware('auth:sanctum')->prefix('user')->group(function(){
+    Route::get('posts/publicos', [PostController::class, 'publicPosts']);
+    Route::apiResource('posts', PostController::class);
 });
 
 
