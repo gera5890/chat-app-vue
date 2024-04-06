@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\PostEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -13,7 +14,9 @@ class PostController extends Controller
     public function index(Request $request)
     {   
         $user = $request->user();
-        $posts = Post::where('user_id', $user->id)
+        $posts = Post::with('user','comments.user', 'likes.user')
+                        ->withCount('likes', 'comments')
+                        ->where('user_id', $user->id)
                         ->orderBy('created_at', 'desc')
                         ->cursorPaginate();
 
@@ -56,6 +59,8 @@ class PostController extends Controller
             'image' => $path ?? null,
             'visibility' => $request->visibility ?? 'public'
         ]);
+
+        broadcast(new PostEvent($post));
 
         return response()->json([
             'message' => 'Post created',

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\LikeCommentController;
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\API\PostController;
 use Illuminate\Http\Request;
@@ -41,6 +42,11 @@ Route::middleware('auth:sanctum')->group(function(){
 Route::middleware('auth:sanctum')->prefix('user')->group(function(){
     Route::get('posts/publicos', [PostController::class, 'publicPosts']);
     Route::apiResource('posts', PostController::class);
+
+    Route::controller(LikeCommentController::class)->group(function(){
+        Route::post('comments', 'PostComment');
+        Route::get('like/{postId}', 'LikeUnlike');
+    });
 });
 
 
